@@ -17,6 +17,8 @@ jobs:
 
     env:
       Solution_Path: samples/MvvmSampleUwp.sln
+      UWP_Project_Path: MvvmSampleUwp.csproj
+      UWP_Project_Directory: .\MvvmSampleUwp\
 
     steps:
 
@@ -56,6 +58,31 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
+
+    - name: Update manifest version
+      if: github.event_name == 'push'
+      run: |
+        [xml]$manifest = get-content ".\$env:UWP_Project_Directory\Package.appxmanifest"
+        $manifest.Package.Identity.Version = "${{steps.getVersion.outputs.result}}"
+        $manifest.save(".\$env:UWP_Project_Directory\Package.appxmanifest")
+    
+    - name: Update thumbprint
+      run: |
+        function UpdateThumbprint($solution_path){
+          $csprojs = Get-ChildItem "$($solution_path)*.csproj"
+          [xml]$sol = get-Content $csprojs[0].FullName
+          $sol.Project.PropertyGroup[0].PackageCertificateThumbprint = "${{ secrets.Pfx_Base64_Thumbprint }}"
+          $sol.save($csprojs[0].FullName)
+        }
+        UpdateThumbprint($env:UWP_Project_Directory)
+        
+    - name: Decode the Pfx
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Pfx_Base64_Encoded }}")
+        $currentDirectory = Get-Location
+        $certificatePath = Join-Path -Path $currentDirectory -ChildPath $env:UWP_Project_Directory -AdditionalChildPath $env:SigningCertificate
+        [IO.File]::WriteAllBytes("$env:SigningCertificate", $pfx_cert_byte)
+        
     - name: Build the sideload solution
       run: msbuild $env:Solution_Path /p:Platform=x86 /p:Configuration=$env:Configuration /p:AppxBundle=$env:AppxBundle /p:UapAppxPackageBuildMode=$env:BuildMode /p:AppxBundlePlatforms="x86|x64|ARM|ARM64" /p:AppxPackageDir=C:\DeployOutput /p:PackageCertificateKeyFile=$env:SigningCertificate /restore 
       env:
