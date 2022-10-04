@@ -1,6 +1,9 @@
 # https://github.com/ArchieCoder/MyGitHubApp
 # http://www.dotnetapp.com/github-actions-for-uwp-apps-the-good-and-the-bad-and-the-ugly/
 
+# This workflow is based on my repo's.
+# https://github.com/kurema/BookViewerApp3/blob/master/.github/workflows/releasebuilder.yml
+
 name: Release builder
 
 on:
@@ -48,6 +51,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+        submodule: recursive
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
