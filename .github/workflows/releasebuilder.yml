@@ -13,9 +13,9 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Path: BookViewerApp.sln
-      UWP_Project_Path: BookViewerApp.csproj
-      UWP_Project_Directory: .\BookViewerApp\
+      Solution_Path: samples/MvvmSampleUwp.sln
+      UWP_Project_Path: MvvmSampleUwp.csproj
+      UWP_Project_Directory: .\MvvmSampleUwp\
 
     steps:
 
