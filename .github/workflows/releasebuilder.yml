@@ -72,7 +72,7 @@ jobs:
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Pfx_Base64_Encoded }}")
         $currentDirectory = Get-Location
         $certificatePath = Join-Path -Path $currentDirectory -ChildPath $env:UWP_Project_Directory -AdditionalChildPath $env:SigningCertificate
-        [IO.File]::WriteAllBytes("$env:SigningCertificate", $pfx_cert_byte)
+        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
         
     - name: Build the sideload solution
       run: msbuild $env:Solution_Path /p:Platform=x86 /p:Configuration=$env:Configuration /p:AppxBundle=$env:AppxBundle /p:UapAppxPackageBuildMode=$env:BuildMode /p:AppxBundlePlatforms="x86|x64|ARM|ARM64" /p:AppxPackageDir=C:\DeployOutput /p:PackageCertificateKeyFile=$env:SigningCertificate /p:AppxPackageSigningEnabled=true /p:AppxPackageSigningTimestampDigestAlgorithm=SHA256 /restore 
@@ -81,6 +81,10 @@ jobs:
         BuildMode: StoreUpload
         Configuration: Release
    
+    - name: Remove the .pfx
+      run: |
+        Remove-Item -path $env:UWP_Project_Directory/$env:SigningCertificate
+        
     - name: Create archive
       run: Compress-Archive -Path C:\DeployOutput\* -DestinationPath C:\DeployOutput\StorePackage_${{steps.getVersion.outputs.result}}.zip
 
