@@ -14,8 +14,6 @@ jobs:
 
     env:
       Solution_Path: samples/MvvmSampleUwp.sln
-      UWP_Project_Path: MvvmSampleUwp.csproj
-      UWP_Project_Directory: .\MvvmSampleUwp\
 
     steps:
 
