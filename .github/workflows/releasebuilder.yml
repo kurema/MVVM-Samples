@@ -16,6 +16,7 @@ jobs:
     runs-on: windows-latest
 
     env:
+      SigningCertificate: GitHub_Key.pfx
       Solution_Path: samples/MvvmSampleUwp.sln
       UWP_Project_Path: MvvmSampleUwp.csproj
       UWP_Project_Directory: .\samples\MvvmSampleUwp\
