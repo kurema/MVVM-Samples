@@ -65,18 +65,7 @@ jobs:
         [xml]$manifest = get-content ".\$env:UWP_Project_Directory\Package.appxmanifest"
         $manifest.Package.Identity.Version = "${{steps.getVersion.outputs.result}}"
         $manifest.save(".\$env:UWP_Project_Directory\Package.appxmanifest")
-    
-    - name: Update thumbprint
-      run: |
-        function UpdateThumbprint($solution_path){
-          $csprojs = Get-ChildItem "$($solution_path)*.csproj"
-          [xml]$sol = get-Content $csprojs[0].FullName
-          $sol.Project.PropertyGroup[0].AppendChild($sol.CreateElement("PackageCertificateThumbprint","http://schemas.microsoft.com/developer/msbuild/2003"))
-          $sol.Project.PropertyGroup[0].PackageCertificateThumbprint = "${{ secrets.Pfx_Base64_Thumbprint }}"
-          $sol.save($csprojs[0].FullName)
-        }
-        UpdateThumbprint($env:UWP_Project_Directory)
-        
+       
     - name: Decode the Pfx
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Pfx_Base64_Encoded }}")
