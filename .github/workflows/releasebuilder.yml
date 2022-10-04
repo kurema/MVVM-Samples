@@ -71,6 +71,7 @@ jobs:
         function UpdateThumbprint($solution_path){
           $csprojs = Get-ChildItem "$($solution_path)*.csproj"
           [xml]$sol = get-Content $csprojs[0].FullName
+          $sol.Project.PropertyGroup[0].AppendChild($sol.CreateElement("PackageCertificateThumbprint","http://schemas.microsoft.com/developer/msbuild/2003"))
           $sol.Project.PropertyGroup[0].PackageCertificateThumbprint = "${{ secrets.Pfx_Base64_Thumbprint }}"
           $sol.save($csprojs[0].FullName)
         }
